@@ -1,0 +1,12 @@
+fastapi>=0.109.0
+uvicorn>=0.27.0
+python-dotenv>=1.0.0  # For loading environment variables
+sqlalchemy>=2.0.0  # For database ORM
+pydantic[email]>=2.6.0  # For data validation
+python-jose[cryptography]>=3.3.0  # For JWT tokens
+passlib[bcrypt]>=1.7.4  # For password hashing
+python-multipart>=0.0.9  # For form data
+httpx>=0.26.0  # For HTTP client
+google-cloud-pubsub
+bertopic
+pymongo 
