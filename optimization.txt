@@ -28,7 +28,7 @@ ValueError: too many file descriptors in select()
 
 
 Performance Report:
-1. 100 Users, 10 ramp up.
+1. 100 Users, 10 ramp up. 2 posts
 Type     Name                                                                   # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
 --------|---------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
 POST     /recommendations/                                                        1480     0(0.00%) |   2381      46    5439   2600 |   21.20        0.00
@@ -41,5 +41,33 @@ Type     Name                                                                   
 POST     /recommendations/                                                             2600   2800   3000   3100   3500   3800   4100   4300   5400   5400   5400   1480
 --------|-------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
          Aggregated                                                                    2600   2800   3000   3100   3500   3800   4100   4300   5400   5400   5400   1480
+
+
+
+Performance Report:
+1. 100 Users, 10 ramp up. 100 posts
+Type     Name                                                                   # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|---------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /recommendations/                                                        1049     0(0.00%) |   7393     166   15825   7100 |    9.89        0.00
+--------|---------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                               1049     0(0.00%) |   7393     166   15825   7100 |    9.89        0.00
+
+Response time percentiles (approximated)
+Type     Name                                                                           50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|-------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /recommendations/                                                             7100   8200   9200  10000  11000  12000  13000  14000  15000  16000  16000   1049
+--------|-------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                    7100   8200   9200  10000  11000  12000  13000  14000  15000  16000  16000   1049
+
+Optimization Ideas:
+1. Hide the get_recommendations function from the client
+2. Open 3 new API endpoints for different type of recommendations:
+  - Get recommendations based on tags - this one just like the current API, but it is generally less used.
+  - Get recommendations based on user's profile - this one is will be cache on application level with user_id as the key.
+  - Get recommendations based on post's tags - this one is will be cache on application level with post_id as the key.
+
+3. Use Redis to cache the recommendations
+
+4. Use Redis to cache vectorized post tags (database level) (low priority)
 
 
