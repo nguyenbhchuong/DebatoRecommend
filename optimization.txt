@@ -1,0 +1,45 @@
+ERROR when heavy load test 840 concurrent requests:
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ProgramFiles\Python39\lib\multiprocessing\process.py", line 315, in _bootstrap
+    self.run()
+  File "D:\ProgramFiles\Python39\lib\multiprocessing\process.py", line 108, in run
+    self._target(*self._args, **self._kwargs)
+  File "f:\app develop\debatorecomendservice\venv\lib\site-packages\uvicorn\_subprocess.py", line 80, in subprocess_started
+    target(sockets=sockets)
+  File "f:\app develop\debatorecomendservice\venv\lib\site-packages\uvicorn\server.py", line 66, in run
+    return asyncio.run(self.serve(sockets=sockets))
+  File "D:\ProgramFiles\Python39\lib\asyncio\runners.py", line 47, in run
+    _cancel_all_tasks(loop)
+  File "D:\ProgramFiles\Python39\lib\asyncio\runners.py", line 63, in _cancel_all_tasks
+    loop.run_until_complete(
+  File "D:\ProgramFiles\Python39\lib\asyncio\base_events.py", line 629, in run_until_complete
+    self.run_forever()
+  File "D:\ProgramFiles\Python39\lib\asyncio\base_events.py", line 596, in run_forever
+    self._run_once()
+  File "D:\ProgramFiles\Python39\lib\asyncio\base_events.py", line 1854, in _run_once
+    event_list = self._selector.select(timeout)
+  File "D:\ProgramFiles\Python39\lib\selectors.py", line 324, in select
+    r, w, _ = self._select(self._readers, self._writers, [], timeout)
+  File "D:\ProgramFiles\Python39\lib\selectors.py", line 315, in _select
+    r, w, x = select.select(r, w, w, timeout)
+ValueError: too many file descriptors in select()
+
+
+Performance Report:
+1. 100 Users, 10 ramp up.
+Type     Name                                                                   # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|---------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /recommendations/                                                        1480     0(0.00%) |   2381      46    5439   2600 |   21.20        0.00
+--------|---------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                               1480     0(0.00%) |   2381      46    5439   2600 |   21.20        0.00
+
+Response time percentiles (approximated)
+Type     Name                                                                           50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|-------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /recommendations/                                                             2600   2800   3000   3100   3500   3800   4100   4300   5400   5400   5400   1480
+--------|-------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                    2600   2800   3000   3100   3500   3800   4100   4300   5400   5400   5400   1480
+
+

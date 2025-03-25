@@ -5,6 +5,7 @@ from pymongo import MongoClient
 import json
 import config
 from bson import ObjectId
+from app.models import TopicModel  # Import the new Pydantic model
 
 class TaggingService:
     def __init__(self):
@@ -57,7 +58,7 @@ class TaggingService:
 
     def _combine_weighted_topics(self, paragraph_topics, max_tags=10):
         """
-        Combine weighted topics from multiple paragraphs into a single list of top tags.
+        Combine weighted topics from multiple paragraphs into a single dictionary of tags with weights.
         Each topic in paragraph_topics is a tuple of (topic_name, weight).
         """
         # Create a dictionary to store combined weights
@@ -68,23 +69,23 @@ class TaggingService:
             # Add weights, giving slightly more importance to topics that appear multiple times
             for topic, weight in topics:
                 if topic in topic_weights:
-                    # If topic appears again, add weight with a small bonus
-                    topic_weights[topic] = topic_weights[topic] + weight * 1.2
+                    # Take the maximum weight if topic appears again
+                    topic_weights[topic] = max(topic_weights[topic], weight)
                 else:
                     topic_weights[topic] = weight
 
-        # Sort topics by their combined weights
+        # Sort topics by their combined weights and take top N
         sorted_topics = sorted(
             topic_weights.items(), 
             key=lambda x: x[1], 
             reverse=True
-        )
+        )[:max_tags]
 
-        # Return top N topics with their normalized weights
-        return sorted_topics[:max_tags]
+        # Convert to dictionary format
+        return dict(sorted_topics)
 
     def generate_tags(self, text):
-        """Generate tags for the given text using BERTopic"""
+        """Generate tags with weights for the given text using BERTopic"""
         print("text", text)
         # First split by newlines
         initial_paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
@@ -103,24 +104,17 @@ class TaggingService:
                 
             # Get all topics and their weights for this paragraph
             topic_info = self.model.get_topic(topic_ids)
-            # topic_info is a list of (topic_name, weight) tuples
-            # Take top 10 topics that aren't -1
             paragraph_topics.append(topic_info[:10])
             
-        # Combine topics from all paragraphs
+        # Combine topics from all paragraphs into a dictionary
         final_topics = self._combine_weighted_topics(paragraph_topics)
         
-        # Extract just the topic names for backwards compatibility
-        tags = [topic for topic, weight in final_topics]
-        
         print("Final topics with weights:", final_topics)
-        print("Final tags:", tags)
-        return tags
+        return final_topics
 
     def process_message(self, message):
         """Process a single message from Pub/Sub"""
         try:
-            # Get topic_id from message attributes
             print(f"Received message: {message}")
             topic_id = message.attributes.get('post_id')
             
@@ -133,32 +127,35 @@ class TaggingService:
             topic_id = ObjectId(topic_id)
 
             # Fetch the topic from MongoDB
-            topic = self.posts_collection.find_one({'_id': topic_id})
+            topic_dict = self.posts_collection.find_one({'_id': topic_id})
             
-            if not topic:
+            if not topic_dict:
                 print(f"Topic not found: {topic_id}")
                 message.ack()
                 return
 
+            # Convert to Pydantic model
+            topic = TopicModel.from_dict(topic_dict)
+
             # Combine title and description for tag generation
-            content = f"{topic.get('title', '')} {topic.get('description', '')}"
+            content = f"{topic.title} {topic.description or ''}"
             
             if not content.strip():
                 print(f"No content to generate tags for topic: {topic_id}")
                 message.ack()
                 return
 
-            # Generate tags
-            tags = self.generate_tags(content)
+            # Generate tags with weights
+            tags_with_weights = self.generate_tags(content)
 
-            # Update MongoDB
+            # Update MongoDB using the new tag format
             self.posts_collection.update_one(
                 {'_id': topic_id},
-                {'$set': {'tags': tags}},
+                {'$set': {'tags': tags_with_weights}},
                 upsert=False
             )
 
-            print(f"Successfully processed topic {topic_id} with tags: {tags}")
+            print(f"Successfully processed topic {topic_id} with weighted tags: {tags_with_weights}")
             message.ack()
 
         except Exception as e:

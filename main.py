@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import api
+from typing import List
+from app.recommendation_service import RecommendationService
 
 app = FastAPI(
     title="Backend API",
@@ -20,6 +22,8 @@ app.add_middleware(
 # Include API routes
 app.include_router(api.router, prefix="/api/v1")
 
+recommendation_service = RecommendationService()
+
 # Health check endpoint
 @app.get("/health")
 async def health_check():
@@ -27,6 +31,20 @@ async def health_check():
         "status": "healthy",
         "api_version": "1.0.0"
     }
+
+@app.post("/recommendations/", response_model=List[str])
+async def get_recommendations(tags: List[str]):
+    """
+    Get related posts based on a list of tags
+    """
+    if not tags:
+        raise HTTPException(status_code=400, detail="Tags list cannot be empty")
+    
+    try:
+        related_posts = recommendation_service.get_related_posts(tags)
+        return related_posts
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
