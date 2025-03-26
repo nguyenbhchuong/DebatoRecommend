@@ -14,3 +14,7 @@ POSTS_COLLECTION = os.getenv('POSTS_COLLECTION', 'posts')
 
 # BERTopic settings
 BERTOPIC_MODEL_PATH = os.getenv('BERTOPIC_MODEL_PATH', 'model') 
+
+REDIS_HOST = "localhost"  # or your Redis host
+REDIS_PORT = 6379
+REDIS_DB = 0

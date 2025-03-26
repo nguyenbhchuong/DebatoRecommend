@@ -5,7 +5,7 @@ from pymongo import MongoClient
 import json
 import config
 from bson import ObjectId
-from app.models import TopicModel  # Import the new Pydantic model
+from app.schemas.topic import TopicModel  # Import the new Pydantic model
 
 class TaggingService:
     def __init__(self):
@@ -86,14 +86,13 @@ class TaggingService:
 
     def generate_tags(self, text):
         """Generate tags with weights for the given text using BERTopic"""
-        print("text", text)
-        # First split by newlines
+        # print("text", text)
         initial_paragraphs = [p.strip() for p in text.split('\n') if p.strip()]
         
         # Break long paragraphs into smaller chunks
         paragraphs = self._split_long_paragraphs(initial_paragraphs)
         
-        print("Paragraphs:", paragraphs)
+        # print("Paragraphs:", paragraphs)
         topics, probs = self.model.transform(paragraphs)
         
         # Get top 10 topics for each paragraph
@@ -101,8 +100,7 @@ class TaggingService:
         for i, topic_ids in enumerate(topics):
             if topic_ids == -1:  # Skip outlier topics
                 continue
-                
-            # Get all topics and their weights for this paragraph
+    
             topic_info = self.model.get_topic(topic_ids)
             paragraph_topics.append(topic_info[:10])
             
@@ -123,7 +121,6 @@ class TaggingService:
                 message.ack()
                 return
 
-            # Convert string ID to ObjectId for MongoDB
             topic_id = ObjectId(topic_id)
 
             # Fetch the topic from MongoDB
@@ -137,7 +134,6 @@ class TaggingService:
             # Convert to Pydantic model
             topic = TopicModel.from_dict(topic_dict)
 
-            # Combine title and description for tag generation
             content = f"{topic.title} {topic.description or ''}"
             
             if not content.strip():
@@ -148,7 +144,7 @@ class TaggingService:
             # Generate tags with weights
             tags_with_weights = self.generate_tags(content)
 
-            # Update MongoDB using the new tag format
+            # Update MongoDB
             self.posts_collection.update_one(
                 {'_id': topic_id},
                 {'$set': {'tags': tags_with_weights}},
@@ -160,7 +156,7 @@ class TaggingService:
 
         except Exception as e:
             print(f"Error processing message: {e}")
-            message.ack()  # Acknowledge even on error to prevent redelivery
+            message.ack()  # Acknowledge to prevent redelivery
 
     def start(self, timeout=None):
         """Start listening for messages"""

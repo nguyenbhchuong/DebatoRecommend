@@ -1,4 +1,4 @@
-from tag_service import TaggingService
+from taggingService.tag_service import TaggingService
 
 def main():
     service = TaggingService()
