@@ -1,6 +1,7 @@
 # AI-Powered Content Recommendation System
 
 A microservice-based recommendation system that automatically generates content tags and provides related content suggestions using BERTopic and cosine similarity.
+The backend repo: https://github.com/nguyenbhchuong/DebatoBackend
 
 ## 🚀 Key Features
 
