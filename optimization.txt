@@ -161,6 +161,50 @@ POST     /api/v1/recommendations/tags                                           
 --------|-------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
          Aggregated                                                                    4800   6700   7700   8200   9100   9800  10000  11000  11000  12000  12000   8127                                                           1480     0(0.00%) |   2381      46    5439   2600 |   21.20        0.00
 
+
+Performance Report:
+1. 500 Users, 100 ramp up. 100 posts && #1 and #2 Optimization Ideas implemented. Weight 10:0
+Type     Name                                                                   # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|---------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/v1/recommendations/posts?postId=67d2bad565bebb02fee29efd            2135     0(0.00%) |     48       2    4745      6 |   15.70        0.00
+POST     /api/v1/recommendations/posts?postId=67d2cecf5791521606456953            2146     0(0.00%) |     54       2    4730      6 |   15.78        0.00
+POST     /api/v1/recommendations/posts?postId=67e27fe730a3f4966670c15f            2138     0(0.00%) |     44       2    4745      6 |   15.72        0.00
+POST     /api/v1/recommendations/posts?postId=67e2801d30a3f4966670c162            2112     0(0.00%) |     47       2    4705      6 |   15.53        0.00
+POST     /api/v1/recommendations/posts?postId=67e2801e30a3f4966670c165            2271     0(0.00%) |     44       2    4737      6 |   16.70        0.00
+POST     /api/v1/recommendations/posts?postId=67e2801f30a3f4966670c167            2184     0(0.00%) |     50       2    4739      6 |   16.06        0.00
+POST     /api/v1/recommendations/posts?postId=67e2801f30a3f4966670c16a            2158     0(0.00%) |     44       2    4727      6 |   15.87        0.00
+POST     /api/v1/recommendations/posts?postId=67e2802030a3f4966670c16d            2230     0(0.00%) |     48       2    4606      6 |   16.40        0.00
+POST     /api/v1/recommendations/posts?postId=67e2802030a3f4966670c16f            2209     0(0.00%) |     61       2    4743      6 |   16.24        0.00
+POST     /api/v1/recommendations/posts?postId=67e2802130a3f4966670c171            2229     0(0.00%) |     44       2    4702      6 |   16.39        0.00
+POST     /api/v1/recommendations/posts?postId=67e2803030a3f4966670c1ba            2249     0(0.00%) |     56       2    4743      6 |   16.54        0.00
+POST     /api/v1/recommendations/posts?postId=67e2803030a3f4966670c1bc            2208     0(0.00%) |     50       2    4725      6 |   16.23        0.00
+POST     /api/v1/recommendations/posts?postId=67e2803030a3f4966670c1be            2190     0(0.00%) |     41       2    4602      6 |   16.10        0.00
+POST     /api/v1/recommendations/posts?postId=67e2803130a3f4966670c1c0            2212     0(0.00%) |     42       2    4736      6 |   16.26        0.00
+POST     /api/v1/recommendations/posts?postId=67e2803230a3f4966670c1c2            2185     0(0.00%) |     55       2    4599      6 |   16.07        0.00
+--------|---------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                              32856     0(0.00%) |     49       2    4745      6 |  241.58        0.00
+Response time percentiles (approximated)
+Type     Name                                                                           50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|-------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/v1/recommendations/posts?postId=67d2bad565bebb02fee29efd                    6      8      9     10     13     17     44   1800   4600   4700   4700   2135
+POST     /api/v1/recommendations/posts?postId=67d2cecf5791521606456953                    6      8      9     10     12     17     26   1900   4600   4700   4700   2146
+POST     /api/v1/recommendations/posts?postId=67e27fe730a3f4966670c15f                    6      8      9      9     12     16     27   1900   3700   4700   4700   2138
+POST     /api/v1/recommendations/posts?postId=67e2801d30a3f4966670c162                    6      8      9     10     13     16     27   1900   4600   4700   4700   2112
+POST     /api/v1/recommendations/posts?postId=67e2801e30a3f4966670c165                    6      8      9     10     12     16     28   1900   4600   4700   4700   2271
+POST     /api/v1/recommendations/posts?postId=67e2801f30a3f4966670c167                    6      8      9     10     13     16     30   1900   4600   4700   4700   2184
+POST     /api/v1/recommendations/posts?postId=67e2801f30a3f4966670c16a                    6      7      9     10     12     16     27   1900   4600   4700   4700   2158
+POST     /api/v1/recommendations/posts?postId=67e2802030a3f4966670c16d                    6      8      9     10     13     17     31   1900   4600   4600   4600   2230
+POST     /api/v1/recommendations/posts?postId=67e2802030a3f4966670c16f                    6      8      9     10     13     17     45   2900   4600   4700   4700   2209
+POST     /api/v1/recommendations/posts?postId=67e2802130a3f4966670c171                    6      8      9     10     12     16     26   1900   4600   4700   4700   2229
+POST     /api/v1/recommendations/posts?postId=67e2803030a3f4966670c1ba                    6      8      9     10     13     17     34   2800   4700   4700   4700   2249
+POST     /api/v1/recommendations/posts?postId=67e2803030a3f4966670c1bc                    6      8      9     10     12     16     29   1900   4600   4700   4700   2208
+POST     /api/v1/recommendations/posts?postId=67e2803030a3f4966670c1be                    6      7      9      9     12     16     25   1800   4500   4600   4600   2190
+POST     /api/v1/recommendations/posts?postId=67e2803130a3f4966670c1c0                    6      7      9      9     12     15     26   1000   4600   4700   4700   2212
+POST     /api/v1/recommendations/posts?postId=67e2803230a3f4966670c1c2                    6      8      9     10     13     17     49   2600   4500   4600   4600   2185
+--------|-------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                       6      8      9     10     13     16     29   1900   4600   4700   4700  32856
+
+
 Optimization Ideas:
   1. Fast finding with a threshold of similarity. If a post passed the threshold, it is chosen and its cache will be used.
    Therefore we don't need to compute the similarity for all posts.
